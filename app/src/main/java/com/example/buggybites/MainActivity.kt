@@ -55,7 +55,11 @@ class OrdersViewModel : ViewModel() {
 @Composable
 fun BuggyBitesApp(viewModel: OrdersViewModel = viewModel()) {
     var showAddSheet by remember { mutableStateOf(false) }
-    val visibleOrders = viewModel.orders // Filtering will be a future improvement.
+    val visibleOrders = when (viewModel.selectedFilter) {
+        OrderFilter.ALL -> viewModel.orders
+        OrderFilter.READY -> viewModel.orders.filter { it.isReady }
+        OrderFilter.PREPARING -> viewModel.orders.filter { !it.isReady }
+    }
 
     MaterialTheme {
         Scaffold(
@@ -66,7 +70,9 @@ fun BuggyBitesApp(viewModel: OrdersViewModel = viewModel()) {
                 }
             }
         ) { padding ->
-            Column(Modifier.padding(padding).fillMaxSize()) {
+            Column(Modifier
+                .padding(padding)
+                .fillMaxSize()) {
                 Text(
                     text = "${viewModel.orders.size} orders today",
                     modifier = Modifier.padding(16.dp),
